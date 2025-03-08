@@ -3,12 +3,14 @@ import Modal from "../Modal";
 import { PiSignOutBold, PiPlusCircle } from "react-icons/pi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { IRoot } from "../../interface/IUser";
 
 const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
+    const userAvatar = useSelector((state:IRoot)=>state.users.avatar);
     const [isOpen, setIsOpen] = useState(false);
 
     const handleModal = (e) => {
-        e.stopPropagation();
         setIsOpen(!isOpen);
     };
 
@@ -33,7 +35,9 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
             {/* Navbar Items (Hidden in mobile, shown in large screens) */}
             <div className="hidden lg:flex items-center gap-6">
                 {/* Avatar */}
-                <div className="w-10 h-10 bg-gray-300 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-400 transition-all"></div>
+                <div className="w-10 h-10 bg-gray-300 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-400 transition-all">
+                    <img src={userAvatar} alt="Avatar" className="w-10 h-10 rounded-full" />
+                </div>
 
                 <button
                     onClick={handleModal}
@@ -86,7 +90,7 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
             </div>
 
             {/* Modal */}
-            {isOpen && <Modal onBlur={handleModal} />}
+            {isOpen && <Modal onClose={handleModal} />}
 
             {/* Overlay when sidebar is open */}
             {menuOpen && (

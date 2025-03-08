@@ -18,6 +18,13 @@ export const authApi = createApi({
                 method:"POST",
                 data:userData
             })
+        }),
+        logoutUser: build.mutation({
+            query:(data)=>({
+                url:"/users/logout",
+                method:"POST",
+                data,
+            })
         })
     }),
 });

@@ -11,10 +11,25 @@ export const postApi = createApi({
                 method: "POST",
                 data
             })
+        }),
+        getPost: build.query({
+            query:()=>({
+                url:"/posts/getPost",
+                method:"GET",
+            })
+        }),
+        likePost: build.mutation({
+            query:(data)=>({
+                url:"/posts/likePost",
+                method:"POST",
+                data
+            })
         })
     })
 })
 
 export const { 
-    useCreatePostMutation 
+    useCreatePostMutation,
+    useGetPostQuery, 
+    useLikePostMutation
 } = postApi;

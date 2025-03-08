@@ -1,11 +1,21 @@
 import { Routes, Route, Navigate } from "react-router"
-import React from "react";
+import React, { useEffect } from "react";
 import Cookies from "js-cookie"; // Import js-cookie
 import App from "./App";
 import Auth from "./pages/Auth";
+import { useDispatch } from "react-redux";
+import { userActions } from "./services/redux/userSlice";
 
 function Router() {
-   const isAuthenticated = !!Cookies.get("accessToken"); // Check if token exists in cookies
+   const dispatch = useDispatch();
+   const isAuthenticated = !!Cookies.get("accessToken");
+   
+   useEffect(()=>{
+      const user = localStorage.getItem("user");
+      const avatar = localStorage.getItem("avatar");
+      dispatch(userActions.setUserState(user));
+      dispatch(userActions.setUserProfile(avatar));
+   },[]);
 
    return (
       <Routes>

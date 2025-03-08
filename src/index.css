@@ -53,6 +53,10 @@
 }
 
 @media screen and (max-width:767px) {
+    .rs-posts{
+        width: 100% !important;
+        margin: auto !important;
+    }    
     .company__logo h1{
         font-size: 5vw !important;
     }

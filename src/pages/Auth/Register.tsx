@@ -41,6 +41,14 @@ const Register = ({ userDetail, handleSubmit, handleChange }) => {
                         className="border border-[#989898] p-1 rounded md:p-2" type="password" name="password" id="password"
                         placeholder="Enter your password" required />
                 </div>
+                <div className="flex flex-col w-full">
+                    <label htmlFor="password" className="text-[2.8vw] md:text-[1vw]">Avatar</label>
+                    <input
+                        onChange={handleChange}
+                        type="file" name="avatar" id="avatar"
+                        className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-lg cursor-pointer 
+                        file:bg-indigo-700 file:text-white file:px-3 file:py-2 file:rounded-lg hover:file:bg-indigo-800 transition" />
+                </div>
                 <button onClick={handleSubmit}
                     className="bg-indigo-800 w-full text-white p-2 rounded cursor-pointer">Submit</button>
             </form>
