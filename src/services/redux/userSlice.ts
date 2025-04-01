@@ -15,8 +15,9 @@ const userSlice = createSlice({
         setUserState:(state,action)=>{
             state.user = action?.payload;
         },
-        clearUserState:(state,action)=>{
+        clearUserState:(state)=>{
             state.user = "";
+            state.avatar = "";
         }
     }
 })

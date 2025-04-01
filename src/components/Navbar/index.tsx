@@ -1,18 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../Modal";
+import Cookies from "js-cookie";
 import { PiSignOutBold, PiPlusCircle } from "react-icons/pi";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IRoot } from "../../interface/IUser";
+import { NavLink, useNavigate } from "react-router";
+import { userActions } from "../../services/redux/userSlice";
+import { useCreatePostMutation } from "../../services/api/postApi";
 
-const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
-    const userAvatar = useSelector((state:IRoot)=>state.users.avatar);
+const Navbar = ({ menuOpen, handleGetFeed, handleMenu, handleMenuOpen, handleMenuClose }) => {
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
+    const [postDetails, setPostDetails] = useState({
+        title: "",
+        description: "",
+        image:""
+    });
+    const [createPost, { isLoading, isSuccess }] = useCreatePostMutation();
+    const userAvatar = useSelector((state:IRoot)=>state.users.avatar);
 
-    const handleModal = (e) => {
+    const handleModal = () => {
         setIsOpen(!isOpen);
     };
+
+    const handlelog=(e)=>{
+        e.preventDefault();
+        dispatch(userActions.clearUserState());
+        localStorage.removeItem("user");
+        localStorage.removeItem("avatar");
+        Cookies.remove("accessToken");
+        navigate("/login");
+    }
+
+    const handleInput = (e: { target: { name: any; value: any; }; }) => {
+        const { name, value } = e.target;
+        setPostDetails((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleCreatePost=async(e)=>{
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("title",postDetails?.title);
+        formData.append("description",postDetails?.description);
+        if(postDetails?.image){
+            formData.append("image",postDetails?.image);
+        }else{
+            formData.append("image","");
+        }
+        const res = await createPost(formData);
+        if(res?.data?.success){
+            handleModal();
+            handleGetFeed();
+        }
+    }
+
+    const handleImageChange=(e)=>{
+        const imageFile = e.target.files[0];
+        setPostDetails({
+            ...postDetails,
+            image:imageFile
+        });
+    }
 
     return (
         <div className="shadow-md bg-white flex items-center justify-between px-6 py-3 border-b border-gray-300 h-[8vh]">
@@ -35,7 +90,9 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
             {/* Navbar Items (Hidden in mobile, shown in large screens) */}
             <div className="hidden lg:flex items-center gap-6">
                 {/* Avatar */}
-                <div className="w-10 h-10 bg-gray-300 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-400 transition-all">
+                <div onClick={()=>{
+                    navigate("/profile")
+                }} className="w-10 h-10 bg-gray-300 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-400 transition-all">
                     <img src={userAvatar} alt="Avatar" className="w-10 h-10 rounded-full" />
                 </div>
 
@@ -47,7 +104,9 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
                     <span>Create</span>
                 </button>
 
-                <button className="cursor-pointer flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-500 transition-all">
+                <button 
+                    onClick={handlelog}
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-500 transition-all">
                     <PiSignOutBold size={20} />
                     <span>Logout</span>
                 </button>
@@ -69,9 +128,12 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
                 </div>
 
                 <ul className="flex flex-col gap-6 px-6 text-lg">
-                    <li className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-all">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                        <span>Profile</span>
+                    <li 
+                        onClick={()=>{
+                        navigate("/profile")
+                    }} className="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-all">
+                        {userAvatar ? <img className="w-10 h-10 rounded-full" src={userAvatar} alt="avatar" /> : <div className="w-8 h-8 bg-gray-300 rounded-full"></div>}
+                        <span className="text-sm font-semibold">Profile</span>
                     </li>
 
                     <li
@@ -82,15 +144,24 @@ const Navbar = ({menuOpen, handleMenu, handleMenuOpen, handleMenuClose}) => {
                         <span>Create</span>
                     </li>
 
-                    <li className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-red-500 transition-all">
-                        <PiSignOutBold size={22} />
+                    <li 
+                        onClick={handlelog} 
+                        className="flex items-center gap-2 cursor-pointer text-gray-700 hover:text-red-500 transition-all">
+                        <PiSignOutBold size={20} />
                         <span>Logout</span>
                     </li>
                 </ul>
             </div>
 
             {/* Modal */}
-            {isOpen && <Modal onClose={handleModal} />}
+            {isOpen && <Modal
+                isLoading={isLoading}
+                postDetails={postDetails}
+                onChange={handleImageChange}
+                onInputChange={handleInput}
+                onSubmit={handleCreatePost}
+                onClose={handleModal}
+            />}
 
             {/* Overlay when sidebar is open */}
             {menuOpen && (

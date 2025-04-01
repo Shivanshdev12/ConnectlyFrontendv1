@@ -5,6 +5,7 @@ import App from "./App";
 import Auth from "./pages/Auth";
 import { useDispatch } from "react-redux";
 import { userActions } from "./services/redux/userSlice";
+import Profile from "./pages/Profile";
 
 function Router() {
    const dispatch = useDispatch();
@@ -16,12 +17,13 @@ function Router() {
       dispatch(userActions.setUserState(user));
       dispatch(userActions.setUserProfile(avatar));
    },[]);
-
+   
    return (
       <Routes>
          <Route path="/home" element={isAuthenticated ? <App /> : <Navigate to="/login" />} />
          <Route path="/register" element={<Auth />} />
-         <Route path="/login" element={isAuthenticated ? <Navigate to="/home"/> : <Auth/>} />
+         <Route path="/login" element={<Auth/>} />
+         <Route path="/profile" element={isAuthenticated ? <Profile/> : <Navigate to="/login"/>} />
          <Route path="/" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
       </Routes>
    );

@@ -6,10 +6,12 @@ import { useGetPostQuery } from "../../services/api/postApi";
 import { useLikePostMutation } from "../../services/api/postApi";
 import { IPost } from "../../interface/IPost";
 import { useAddCommentMutation } from "../../services/api/commentApi";
+import SearchUsers from "../../components/SearchModal";
 
 const Main = () => {
     const [page, setPage] = useState<number>(1);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
     const [postLikes, setPostLikes] = useState<string[]>([]);
     const [comment, setComment] = useState("");
     const [feed, setFeed] = useState<IPost[]>([]);
@@ -22,11 +24,13 @@ const Main = () => {
     const [likePost, { isLoading: isLikeLoading, isSuccess: isLikeSucces }] = useLikePostMutation();
     const [addComment, { isLoading: isCommentLoading, isSuccess: isCommentSuccess }] = useAddCommentMutation();
 
-    const handleMenu = () => {
-        setMenuOpen(!menuOpen);
-    }
+    const handleMenu = () => { setMenuOpen(!menuOpen) }
+
     const handleMenuOpen = () => { setMenuOpen(true) }
     const handleMenuClose = () => { setMenuOpen(false) }
+
+    const handleSearch = () => { setSearchOpen(true); }
+    const handleSearchClose = () => { setSearchOpen(false); }
 
     const handleLikePost = async (id: string) => {
         try {
@@ -78,12 +82,15 @@ const Main = () => {
     return <React.Fragment>
         <Navbar
             menuOpen={menuOpen}
+            handleGetFeed={refetch}
             handleMenu={handleMenu}
             handleMenuOpen={handleMenuOpen}
             handleMenuClose={handleMenuClose}
         />
         <div className="grid grid-cols-1 lg:grid-cols-[auto_0.8fr_0.2fr] h-[92vh] overflow-y-auto">
-            {<SideNavbar />}
+            {<SideNavbar 
+                open={searchOpen}
+                handleSearch={handleSearch} />}
             <div className="border-r border-[#989898] p-6">
                 <div className="px-2 flex flex-col gap-4 rs-posts">
                     {feed?.map((post: IPost) => {
@@ -91,6 +98,7 @@ const Main = () => {
                             key={post?._id}
                             id={post?._id}
                             post={post}
+                            likes={post?.likes}
                             comment={comment}
                             handleLikePost={handleLikePost}
                             handleComment={handleComment}
@@ -100,6 +108,7 @@ const Main = () => {
                 </div>
             </div>
         </div>
+        {searchOpen && <SearchUsers isOpen={true} onClose={handleSearchClose} />}
     </React.Fragment>
 }
 

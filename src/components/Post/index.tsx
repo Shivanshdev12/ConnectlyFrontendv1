@@ -1,18 +1,20 @@
 import moment from "moment";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { PiHeart, PiHeartFill, PiChatCircle, PiShareFat, PiTelegramLogo } from "react-icons/pi";
+import { PiHeart, PiHeartFill, PiChatCircle, PiShareFat, PiTelegramLogo, PiHandsClapping } from "react-icons/pi";
+import { FaHandsClapping } from "react-icons/fa6";
 import { IRoot } from "../../interface/IUser";
 
 const Post = ({
     id,
     post,
     comment,
+    likes,
     handleComment,
     handleCommentSubmit,
     handleLikePost
 }) => {
-    const { user, likes, createdAt: timestamp, image: postImg, title, description: desc, comments } = post;
+    const { user, createdAt: timestamp, image: postImg, title, description: desc, comments } = post;
     const userState = useSelector((state: IRoot) => state.users.user);
     const [showCommentInput, setShowCommentInput] = useState(false);
 
@@ -22,13 +24,20 @@ const Post = ({
 
     return (
         <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 mb-6">
-            <div className="flex items-center gap-3 p-4 border-b">
-                {user?.avatar ?
-                    <img src={user?.avatar || "/default-avatar.png"} alt="Avatar" className="w-10 h-10 rounded-full border" /> :
-                    <p className="flex items-center justify-center text-xs bg-[#F1F1F1] w-10 h-10 rounded-full border border-[#BEBEBE]">{user?.firstName.split("")[0]} {user?.lastName?.split("")[0]}</p>}
+            <div className="flex items-center justify-between gap-3 p-4 border-b">
+                <div className="flex items-center justify-between gap-4">
+                    <>
+                        {user?.avatar ?
+                            <img src={user?.avatar || "/default-avatar.png"} alt="Avatar" className="w-10 h-10 rounded-full border" /> :
+                            <p className="flex items-center justify-center text-xs bg-[#F1F1F1] w-10 h-10 rounded-full border border-[#BEBEBE]">{user?.firstName.split("")[0]} {user?.lastName?.split("")[0]}</p>}
+                    </>
+                    <div>
+                        <h2 className="text-gray-800 font-semibold">{user?.firstName + " " + user?.lastName || "User"}</h2>
+                        <span className="text-gray-500 text-xs">{moment(timestamp)?.format("DD-MM-YY") || "Just now"}</span>
+                    </div>
+                </div>
                 <div>
-                    <h2 className="text-gray-800 font-semibold">{user?.firstName + " " + user?.lastName || "User"}</h2>
-                    <span className="text-gray-500 text-xs">{moment(timestamp)?.format("DD-MM-YY") || "Just now"}</span>
+                    <button className="border rounded px-2 py-1 text-[#000] text-xs shadow">Follow</button>
                 </div>
             </div>
 
@@ -46,15 +55,15 @@ const Post = ({
             </div>
 
             <div className="flex justify-between px-4 py-3 text-gray-600 text-lg border-t">
-                <button onClick={() => handleLikePost(id)} className="flex items-center gap-2 hover:text-red-500 transition cursor-pointer">
-                    {likes?.includes(userState?._id) ? (
+                <button onClick={() => handleLikePost(id)} className="flex items-center gap-2 hover:text-yellow-500 transition cursor-pointer">
+                    {likes?.includes(userState) ? (
                         <>
-                            <PiHeartFill className="text-red-500 text-[1.2rem]" />
+                            <FaHandsClapping className="text-yellow-500 text-[1.2rem]" />
                             <span className="text-sm font-medium">Liked</span>
                         </>
                     ) : (
                         <>
-                            <PiHeart className="text-[1.2rem]" />
+                            <PiHandsClapping className="text-[1.2rem]" />
                             <span className="text-sm font-medium">Like</span>
                         </>
                     )}

@@ -5,6 +5,6 @@ export interface IPost{
     image?:string;
     user?:any;
     createdAt?:string;
-    likes?:[];
+    likes?:[]|any;  
     dislikes?:number;
 }

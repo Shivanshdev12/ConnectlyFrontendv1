@@ -1,49 +1,36 @@
 import React, { useState } from "react";
 import { PiXCircleBold } from "react-icons/pi";
-import { useCreatePostMutation } from "../../services/api/postApi";
 
-const Modal = ({ onClose }) => {
-    const [createPost, { isLoading, isSuccess }] = useCreatePostMutation();
-    const [postDetails, setPostDetails] = useState({
-        title: "",
-        description: "",
-        image:""
-    });
+interface ModalProp {
+    isLoading?: boolean,
+    postDetails?: any,
+    onChange: (e) => void,
+    onInputChange: (e) => void,
+    onSubmit: (e) => void,
+    onClose: () => void,
+}
+
+const Modal = ({ isLoading,
+    postDetails,
+    onClose,
+    onSubmit,
+    onChange,
+    onInputChange }: ModalProp) => {
 
     const handleInput = (e: { target: { name: any; value: any; }; }) => {
-        const { name, value } = e.target;
-        setPostDetails((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        onInputChange(e);
     };
 
-    const handleCreatePost=async(e)=>{
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("title",postDetails?.title);
-        formData.append("description",postDetails?.description);
-        if(postDetails?.image){
-            formData.append("image",postDetails?.image);
-        }else{
-            formData.append("image","");
-        }
-        const res = await createPost(formData);
-        if(res?.data?.success){
-            onClose();
-        }
+    const handleCreatePost = async (e) => {
+        onSubmit(e);
     }
 
-    const handleImageChange=(e)=>{
-        const imageFile = e.target.files[0];
-        setPostDetails({
-            ...postDetails,
-            image:imageFile
-        });
+    const handleImageChange = (e) => {
+        onChange(e);
     }
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.7)] backdrop-blur-sm z-50">
             <div className="bg-white shadow-lg rounded-xl p-4 w-[90%] max-w-md animate-fadeIn">
                 {/* Header */}
                 <div className="flex justify-between items-center">
@@ -84,11 +71,10 @@ const Modal = ({ onClose }) => {
 
                     {/* Post Button */}
                     <div className="flex gap-2">
-                        <button className="border p-2 rounded border-gray-500">Rewrite</button>
-                        <button className="border p-2 rounded border-gray-500">AutoCorrect</button>
+                        <button className="border p-2 rounded border-gray-500">Rewrite It</button>
                     </div>
 
-                    <button 
+                    <button
                         onClick={handleCreatePost}
                         type="submit"
                         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300"
