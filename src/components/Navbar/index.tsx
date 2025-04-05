@@ -11,7 +11,6 @@ import { userActions } from "../../services/redux/userSlice";
 import { useCreatePostMutation } from "../../services/api/postApi";
 
 const Navbar = ({ menuOpen, handleGetFeed, handleMenu, handleMenuOpen, handleMenuClose }) => {
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);

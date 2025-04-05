@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+    userObj:{},
     user:"",
     avatar:"",
 }
@@ -9,6 +10,9 @@ const userSlice = createSlice({
     name:"users",
     initialState,
     reducers:{
+        setUser:(state,action)=>{
+            state.userObj = action.payload;
+        },
         setUserProfile:(state,action)=>{
             state.avatar = action?.payload;
         },

@@ -37,7 +37,7 @@ const Auth = () => {
         const formData = new FormData();
         try{
             const {fname, lname, email, password} = userDetail;
-            if(fname === "" || lname === "" || email === "" || password === ""){
+            if(fname === "" || email === "" || password === ""){
                 return;
             }
 

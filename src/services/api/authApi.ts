@@ -37,6 +37,12 @@ export const authApi = createApi({
                 url:`/users/searchUser?q=${searchTerm}`,
                 method:"GET",
             })
+        }),
+        followUser: build.mutation({
+            query:(followingId)=>({
+                url: `/users/followUser?followingId=${followingId}`,
+                method:"POST",
+            })
         })
     }),
 });
@@ -47,4 +53,5 @@ export const {
     useRegisterUserMutation,
     useLoginUserMutation,
     useSearchUserQuery,
+    useFollowUserMutation,
  } = authApi;

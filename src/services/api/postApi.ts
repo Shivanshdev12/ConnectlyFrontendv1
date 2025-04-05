@@ -24,6 +24,12 @@ export const postApi = createApi({
                 method:"POST",
                 data
             })
+        }),
+        getUserPost: build.query({
+            query:({userId})=>({
+                url:`/posts/getUserPost?userId=${userId}`,
+                method:"GET"
+            })
         })
     })
 })
@@ -31,5 +37,6 @@ export const postApi = createApi({
 export const { 
     useCreatePostMutation,
     useGetPostQuery, 
-    useLikePostMutation
+    useLikePostMutation,
+    useGetUserPostQuery,
 } = postApi;

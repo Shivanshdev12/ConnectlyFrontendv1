@@ -8,6 +8,7 @@ interface ModalProp {
     onInputChange: (e) => void,
     onSubmit: (e) => void,
     onClose: () => void,
+    handleRewrite?: any
 }
 
 const Modal = ({ isLoading,
@@ -15,7 +16,8 @@ const Modal = ({ isLoading,
     onClose,
     onSubmit,
     onChange,
-    onInputChange }: ModalProp) => {
+    onInputChange,
+ }: ModalProp) => {
 
     const handleInput = (e: { target: { name: any; value: any; }; }) => {
         onInputChange(e);
@@ -41,7 +43,7 @@ const Modal = ({ isLoading,
                 </div>
 
                 {/* Form */}
-                <form className="mt-4 space-y-4" onSubmit={handleCreatePost}>
+                <form className="mt-4 space-y-4">
                     {/* Title Input */}
                     <input
                         name="title"
@@ -69,10 +71,10 @@ const Modal = ({ isLoading,
                         className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-lg cursor-pointer file:bg-blue-600 file:text-white file:px-3 file:py-2 file:rounded-lg hover:file:bg-blue-700 transition"
                     />
 
-                    {/* Post Button */}
+                    {/* Post Button
                     <div className="flex gap-2">
-                        <button className="border p-2 rounded border-gray-500">Rewrite It</button>
-                    </div>
+                        <button onClick={handleRewrite} className="border p-2 rounded border-gray-500">Rewrite It</button>
+                    </div> */}
 
                     <button
                         onClick={handleCreatePost}

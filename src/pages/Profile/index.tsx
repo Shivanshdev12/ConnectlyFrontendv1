@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { IRoot } from "../../interface/IUser";
 import { PiUserPlus, PiUserCheck, PiGear, PiCamera } from "react-icons/pi";
 import { FaTh, FaBookmark } from "react-icons/fa";
 import { useCoverImageMutation, useGetUserQuery } from "../../services/api/authApi";
+import { useGetUserPostQuery } from "../../services/api/postApi";
 
 const Profile = () => {
     const userId = useSelector((state: IRoot) => state.users.user) || localStorage.getItem("user");
     const {data:user, isLoading, isSuccess, isError} = useGetUserQuery({userId});
+    const {data:userPosts, isLoading: isPostsLoading, isSuccess: isPostsSuccess} = useGetUserPostQuery({userId});
     const [updateImage, {isSuccess: isImageSuccess}] = useCoverImageMutation();
     const [isFollowing, setIsFollowing] = useState(false);
     const [activeTab, setActiveTab] = useState("posts");
@@ -141,6 +143,32 @@ const Profile = () => {
                     </div>
                 )}
             </div>
+
+            {activeTab === "posts" ? (
+                <div className="grid grid-cols-3 gap-2">
+                    {isPostsLoading ? (
+                        <p className="col-span-3 text-center text-gray-500">Loading posts...</p>
+                    ) : userPosts?.data?.length > 0 ? (
+                        userPosts.data.map((post) => (
+                            <div key={post._id} className="relative group">
+                                <img
+                                    src={post.image || ""}
+                                    alt={post.title}
+                                    className="w-full h-32 object-cover rounded-md"
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                    <p className="text-white text-sm font-semibold px-2 text-center truncate">
+                                        {post.title}
+                                    </p>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="col-span-3 text-center text-gray-500">No posts found.</p>
+                    )}
+                </div>
+            ) : (<></>)}
+
         </div>
     );
 };

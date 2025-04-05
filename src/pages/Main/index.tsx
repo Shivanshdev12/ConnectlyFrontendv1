@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import SideNavbar from "../../components/SideNavbar";
-import Navbar from "../../components/Navbar";
 import Post from "../../components/Post";
+import Navbar from "../../components/Navbar";
+import { IPost } from "../../interface/IPost";
+import Loader from "../../components/common/Loader";
+import SideNavbar from "../../components/SideNavbar";
+import SearchUsers from "../../components/SearchModal";
 import { useGetPostQuery } from "../../services/api/postApi";
 import { useLikePostMutation } from "../../services/api/postApi";
-import { IPost } from "../../interface/IPost";
 import { useAddCommentMutation } from "../../services/api/commentApi";
-import SearchUsers from "../../components/SearchModal";
+import { useDispatch } from "react-redux";
 
 const Main = () => {
     const [page, setPage] = useState<number>(1);
@@ -16,13 +18,13 @@ const Main = () => {
     const [comment, setComment] = useState("");
     const [feed, setFeed] = useState<IPost[]>([]);
 
+    const [likePost, { isLoading: isLikeLoading, isSuccess: isLikeSucces }] = useLikePostMutation();
+    const [addComment, { isLoading: isCommentLoading, isSuccess: isCommentSuccess }] = useAddCommentMutation();
     const { data, isLoading, isSuccess, refetch } = useGetPostQuery(page, {
         refetchOnMountOrArgChange: false,
         refetchOnFocus: true,
         refetchOnReconnect: true,
     });
-    const [likePost, { isLoading: isLikeLoading, isSuccess: isLikeSucces }] = useLikePostMutation();
-    const [addComment, { isLoading: isCommentLoading, isSuccess: isCommentSuccess }] = useAddCommentMutation();
 
     const handleMenu = () => { setMenuOpen(!menuOpen) }
 
@@ -77,7 +79,10 @@ const Main = () => {
             setFeed(data.data.posts);
         }
     }, [data]);
-    
+
+    if(isLoading){
+        return <Loader/>
+    }
 
     return <React.Fragment>
         <Navbar

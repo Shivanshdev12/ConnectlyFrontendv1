@@ -1,9 +1,17 @@
 import moment from "moment";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { PiHeart, PiHeartFill, PiChatCircle, PiShareFat, PiTelegramLogo, PiHandsClapping } from "react-icons/pi";
-import { FaHandsClapping } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
 import { IRoot } from "../../interface/IUser";
+import { FaHandsClapping } from "react-icons/fa6";
+import { PiHeart, 
+    PiHeartFill, 
+    PiChatCircle, 
+    PiShareFat, 
+    PiTelegramLogo, 
+    PiHandsClapping } 
+from "react-icons/pi";
+import { useFollowUserMutation } from "../../services/api/authApi";
+import { userActions } from "../../services/redux/userSlice";
 
 const Post = ({
     id,
@@ -12,12 +20,14 @@ const Post = ({
     likes,
     handleComment,
     handleCommentSubmit,
-    handleLikePost
+    handleLikePost,
 }) => {
+    const dispatch = useDispatch();
     const { user, createdAt: timestamp, image: postImg, title, description: desc, comments } = post;
     const userState = useSelector((state: IRoot) => state.users.user);
+    const loggedUser = useSelector((state: IRoot) => state.users.userObj);
     const [showCommentInput, setShowCommentInput] = useState(false);
-
+    
     const handleCommentClick = () => {
         setShowCommentInput(!showCommentInput);
     };
@@ -36,9 +46,11 @@ const Post = ({
                         <span className="text-gray-500 text-xs">{moment(timestamp)?.format("DD-MM-YY") || "Just now"}</span>
                     </div>
                 </div>
-                <div>
-                    <button className="border rounded px-2 py-1 text-[#000] text-xs shadow">Follow</button>
-                </div>
+                {/* {(user?._id == userState) ? <></> : <div>
+                    <button onClick={()=>handleFollowUser(user?._id)} className="border rounded px-2 py-1 text-[#000] text-xs shadow">
+                        {Array.isArray(following) && following.includes(user?._id) ? "Following" : "Follow"}
+                    </button>
+                </div>} */}
             </div>
 
             <div className="p-4">
