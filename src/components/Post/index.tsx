@@ -1,17 +1,18 @@
 import moment from "moment";
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { IRoot } from "../../interface/IUser";
+import { Link } from "react-router";
+import React, { useRef, useState } from "react";
 import { FaHandsClapping } from "react-icons/fa6";
-import { PiHeart, 
-    PiHeartFill, 
+import { useDispatch, useSelector } from "react-redux";
+import { 
     PiChatCircle, 
     PiShareFat, 
     PiTelegramLogo, 
     PiHandsClapping } 
 from "react-icons/pi";
-import { useFollowUserMutation } from "../../services/api/authApi";
-import { userActions } from "../../services/redux/userSlice";
+import { BsThreeDots } from "react-icons/bs";
+import { FiUser, FiFlag } from "react-icons/fi";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Post = ({
     id,
@@ -22,15 +23,26 @@ const Post = ({
     handleCommentSubmit,
     handleLikePost,
 }) => {
-    const dispatch = useDispatch();
-    const { user, createdAt: timestamp, image: postImg, title, description: desc, comments } = post;
+    const { 
+        user, 
+        title, 
+        comments, 
+        image: postImg, 
+        description: desc, 
+        createdAt: timestamp, 
+    } = post;
     const userState = useSelector((state: IRoot) => state.users.user);
-    const loggedUser = useSelector((state: IRoot) => state.users.userObj);
     const [showCommentInput, setShowCommentInput] = useState(false);
-    
+    const [openMenu, setOpenMenu] = useState(false);
+    const menuRef = useRef(null);
+
     const handleCommentClick = () => {
         setShowCommentInput(!showCommentInput);
     };
+
+    const handleMenuClick = () => {
+        setOpenMenu(!openMenu);
+    }
 
     return (
         <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 mb-6">
@@ -46,11 +58,43 @@ const Post = ({
                         <span className="text-gray-500 text-xs">{moment(timestamp)?.format("DD-MM-YY") || "Just now"}</span>
                     </div>
                 </div>
-                {/* {(user?._id == userState) ? <></> : <div>
-                    <button onClick={()=>handleFollowUser(user?._id)} className="border rounded px-2 py-1 text-[#000] text-xs shadow">
-                        {Array.isArray(following) && following.includes(user?._id) ? "Following" : "Follow"}
-                    </button>
-                </div>} */}
+                <div className="relative" ref={menuRef}>
+                    <BsThreeDots
+                        onClick={handleMenuClick}
+                        className="cursor-pointer text-[1.2rem] text-gray-600"
+                    />
+                    <AnimatePresence>
+                        {openMenu && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8, y: -10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.8, y: -10 }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 600,
+                                    damping: 20,
+                                }}                                  
+                                className="absolute top-8 right-[-5px] w-44 bg-white rounded-lg shadow-xl border border-[#a1a1a1] z-50"
+                            >
+                                {/* Arrow */}
+                                <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white border-l border-t border-[#a1a1a1] rotate-45 z-[-1]"></div>
+
+                                <ul className="py-2 text-sm text-gray-700">
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+                                        <FiUser className="text-gray-500" />
+                                        <Link to={`/profile?id=${user?._id}`} className="flex-1">
+                                            View Profile
+                                        </Link>
+                                    </li>
+                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2">
+                                        <FiFlag className="text-red-500" />
+                                        <span className="flex-1">Report</span>
+                                    </li>
+                                </ul>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </div>
 
             <div className="p-4">

@@ -1,21 +1,53 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 import { useSelector } from "react-redux";
 import { IRoot } from "../../interface/IUser";
 import { PiUserPlus, PiUserCheck, PiGear, PiCamera } from "react-icons/pi";
 import { FaTh, FaBookmark } from "react-icons/fa";
-import { useCoverImageMutation, useGetUserQuery } from "../../services/api/authApi";
+import { useCoverImageMutation, useFollowUserMutation, useGetUserQuery } from "../../services/api/authApi";
 import { useGetUserPostQuery } from "../../services/api/postApi";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const Profile = () => {
     const userId = useSelector((state: IRoot) => state.users.user) || localStorage.getItem("user");
-    const {data:user, isLoading, isSuccess, isError} = useGetUserQuery({userId});
-    const {data:userPosts, isLoading: isPostsLoading, isSuccess: isPostsSuccess} = useGetUserPostQuery({userId});
     const [updateImage, {isSuccess: isImageSuccess}] = useCoverImageMutation();
     const [isFollowing, setIsFollowing] = useState(false);
     const [activeTab, setActiveTab] = useState("posts");
-
-    const handleFollow = () => {
-        setIsFollowing(!isFollowing);
+    const [activeId, setActiveId] = useState<string|null>(null);
+    const id = useLocation().search.split("=")[1];
+    const {
+        data: user,
+        isLoading,
+        isSuccess,
+        isError,
+    } = useGetUserQuery(
+        activeId ? { userId: activeId } : skipToken
+    );
+    
+    const {
+        data: userPosts,
+        isLoading: isPostsLoading,
+        isSuccess: isPostsSuccess,
+    } = useGetUserPostQuery(
+        activeId ? { userId: activeId } : skipToken
+    );
+    
+    const [followUser, { 
+        isLoading: isFollowerLoading, 
+        isSuccess: isFollowerSuccess 
+    }] = useFollowUserMutation();
+    
+    const handleFollow = async () => {
+        try{   
+            if(!isFollowing){
+                const followingId = activeId; 
+                const res = await followUser(followingId);
+                setIsFollowing(true);
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
     };
 
     const handleUpdateCoverImage = async (e) => {
@@ -32,6 +64,24 @@ const Profile = () => {
             console.log(err);
         }
     };
+
+    useEffect(()=>{
+        if(id!==undefined && id!==""){
+            setActiveId(id);
+        }
+        else{
+            setActiveId(userId)
+        }
+    },[id, userId]);
+
+    useEffect(()=>{
+        if(user?.data){
+            const {followers} = user?.data;
+            if(followers.includes(userId)){
+                setIsFollowing(true);
+            }
+        }   
+    },[user?.data]);
 
     return (
         <div className="max-w-4xl mx-auto mt-6 p-4 bg-white shadow-md rounded-lg">
@@ -69,7 +119,7 @@ const Profile = () => {
                 <p className="text-gray-600">{user?.bio || "This user has no bio yet."}</p>
 
                 <div className="flex justify-center gap-4 mt-4">
-                    <button
+                    {!id ? <></> : <button
                         onClick={handleFollow}
                         className={`px-4 py-2 rounded-md text-white transition ${
                             isFollowing ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
@@ -77,7 +127,7 @@ const Profile = () => {
                     >
                         {isFollowing ? <PiUserCheck size={18} /> : <PiUserPlus size={18} />}
                         {isFollowing ? "Following" : "Follow"}
-                    </button>
+                    </button>}
                     <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md flex items-center gap-2">
                         <PiGear size={18} /> Settings
                     </button>
@@ -86,7 +136,7 @@ const Profile = () => {
 
             <div className="flex justify-around mt-6 border-t border-gray-300 py-4 text-center">
                 <div>
-                    <span className="text-lg font-bold">{user?.data?.posts?.length || 0}</span>
+                    <span className="text-lg font-bold">{userPosts?.data?.length || 0}</span>
                     <p className="text-gray-500 text-sm">Posts</p>
                 </div>
                 <div>
@@ -99,7 +149,7 @@ const Profile = () => {
                 </div>
             </div>
 
-            <div className="flex justify-center gap-6 border-b border-gray-300 mt-4">
+            <div className="flex justify-center gap-6 border-b border-gray-300 my-2">
                 <button
                     className={`pb-2 text-gray-600 font-semibold ${
                         activeTab === "posts" ? "border-b-2 border-blue-500 text-blue-500" : ""
@@ -118,32 +168,6 @@ const Profile = () => {
                 </button>
             </div>
 
-            <div className="mt-4">
-                {activeTab === "posts" ? (
-                    <div className="grid grid-cols-3 gap-2">
-                        {user?.data?.posts?.map((post) => (
-                            <img
-                                key={post?._id}
-                                src={post?.image || "/placeholder.jpg"}
-                                alt="Post"
-                                className="w-full h-32 object-cover rounded-md"
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-3 gap-2">
-                        {user?.data?.savedPosts?.map((post) => (
-                            <img
-                                key={post?._id}
-                                src={post?.image || "/placeholder.jpg"}
-                                alt="Saved Post"
-                                className="w-full h-32 object-cover rounded-md"
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-
             {activeTab === "posts" ? (
                 <div className="grid grid-cols-3 gap-2">
                     {isPostsLoading ? (
@@ -156,7 +180,7 @@ const Profile = () => {
                                     alt={post.title}
                                     className="w-full h-32 object-cover rounded-md"
                                 />
-                                <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                                <div className="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 rounded-md flex items-center justify-center transition">
                                     <p className="text-white text-sm font-semibold px-2 text-center truncate">
                                         {post.title}
                                     </p>

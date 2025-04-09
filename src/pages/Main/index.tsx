@@ -8,16 +8,19 @@ import SearchUsers from "../../components/SearchModal";
 import { useGetPostQuery } from "../../services/api/postApi";
 import { useLikePostMutation } from "../../services/api/postApi";
 import { useAddCommentMutation } from "../../services/api/commentApi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetNotificationMutation } from "../../services/api/notificationApi";
+import { IRoot } from "../../interface/IUser";
 
 const Main = () => {
     const [page, setPage] = useState<number>(1);
     const [menuOpen, setMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
-    const [postLikes, setPostLikes] = useState<string[]>([]);
     const [comment, setComment] = useState("");
     const [feed, setFeed] = useState<IPost[]>([]);
-
+    const [notifications, setNotifications] = useState([]);
+    const [postLikes, setPostLikes] = useState<string[]>([]);
+    const userId = useSelector((state: IRoot) => state.users.user) || localStorage.getItem("user");
     const [likePost, { isLoading: isLikeLoading, isSuccess: isLikeSucces }] = useLikePostMutation();
     const [addComment, { isLoading: isCommentLoading, isSuccess: isCommentSuccess }] = useAddCommentMutation();
     const { data, isLoading, isSuccess, refetch } = useGetPostQuery(page, {
@@ -25,6 +28,8 @@ const Main = () => {
         refetchOnFocus: true,
         refetchOnReconnect: true,
     });
+    const [getNotification, {isLoading: isNotificationLoading, isSuccess: isNotificationSuccess, data: allNotifications}] = 
+    useGetNotificationMutation();
 
     const handleMenu = () => { setMenuOpen(!menuOpen) }
 
@@ -74,6 +79,13 @@ const Main = () => {
         }
     };
 
+    const handleNotifications=async()=>{
+        const res = await getNotification({userId});
+        if(res?.data?.success){
+            setNotifications(res?.data?.data);
+        }
+    }
+
     useEffect(() => {
         if (data?.data?.posts) {
             setFeed(data.data.posts);
@@ -95,7 +107,9 @@ const Main = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[auto_0.8fr_0.2fr] h-[92vh] overflow-y-auto">
             {<SideNavbar 
                 open={searchOpen}
-                handleSearch={handleSearch} />}
+                notifications={notifications}
+                handleSearch={handleSearch} 
+                handleNotifications={handleNotifications} />}
             <div className="border-r border-[#989898] p-6">
                 <div className="px-2 flex flex-col gap-4 rs-posts">
                     {feed?.map((post: IPost) => {

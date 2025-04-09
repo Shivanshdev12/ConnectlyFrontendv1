@@ -1,16 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PiUserPlus, PiUserCheck, PiX, PiXCircleBold } from "react-icons/pi";
-import { useSearchUserQuery } from "../../services/api/authApi";
+import { useFollowUserMutation, useGetAllUserQuery, useSearchUserQuery } from "../../services/api/authApi";
+import { useSelector } from "react-redux";
+import { IRoot } from "../../interface/IUser";
 
 const SearchUsers = ({ isOpen, onClose }) => {
-    const [searchTerm, setSearchTerm] = useState("");
-    // const [isLoading, setIsLoading] = useState(false);
-    const { data: users, isLoading } = useSearchUserQuery({searchTerm});
-    // const [followUser] = useFollowMutation();
+
+    const [page, setPage] = useState<number>(1);
     const [following, setFollowing] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchResult, setSearchResult] = useState([]);
+    const { data: users, isLoading } = useSearchUserQuery({searchTerm});
+    const loggedUser = useSelector((state: IRoot) => state.users.user) || localStorage.getItem("user");
+    const [followUser, {
+        isLoading: isFollowerLoading,
+        isSuccess: isFollowerSuccess
+    }] = useFollowUserMutation();
 
     const handleFollow = async (userId) => {
-    };
+        try{   
+            const res = await followUser(userId);
+        }
+        catch(err){
+            console.log(err);
+        }
+    }
+
+    useEffect(()=>{
+
+    },[]);
 
     if (!isOpen) return null;
 
@@ -22,7 +40,7 @@ const SearchUsers = ({ isOpen, onClose }) => {
                     <PiXCircleBold size={20} />
                 </button>
                 
-                <h2 className="text-xl font-bold mb-2">Search Users</h2>
+                <h2 className="text-xl font-bold mb-2 text-[#222]">Search Users</h2>
                 
                 {/* Search Input */}
                 <input
@@ -39,8 +57,13 @@ const SearchUsers = ({ isOpen, onClose }) => {
                     {users?.data?.length <= 0 && searchTerm && !isLoading && (
                         <p className="text-gray-500">No users found.</p>
                     )}
-                    {searchTerm.length>1 && Array.isArray(users?.data) ? users?.data?.map((user) => (
-                        <div key={user?._id} className="flex items-center justify-between p-2 border-b">
+                    {Array.isArray(users?.data) ? users?.data?.map((user: {
+                        _id: React.Key | null | undefined;
+                        avatar: any;
+                        firstName: string | undefined;
+                        followers: string[];
+                    }) => (
+                        <div key={user?._id} className="flex items-center justify-between p-2 border-b border-[#a1a1a1]">
                             <div className="flex items-center gap-3">
                                 <img
                                     src={user?.avatar || "/default-avatar.png"}
@@ -50,13 +73,13 @@ const SearchUsers = ({ isOpen, onClose }) => {
                                 <span>{user?.firstName}</span>
                             </div>
                             <button
-                                onClick={() => handleFollow(user?.id)}
-                                className={`px-3 py-1 rounded-md text-white transition ${
-                                    following[user?._id] ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
-                                } flex items-center gap-2`}
+                                onClick={() => handleFollow(user?._id)}
+                                className={`px-3 py-1 rounded-md text-white transition ${user && Array.isArray(user?.followers) &&
+                                    user?.followers?.includes(loggedUser) ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
+                                    } flex items-center gap-2`}
                             >
-                                {following[user?._id] ? <PiUserCheck size={18} /> : <PiUserPlus size={18} />}
-                                {following[user?._id] ? "Following" : "Follow"}
+                                {user?.followers && user?.followers?.includes(loggedUser) ? <PiUserCheck size={18} /> : <PiUserPlus size={18} />}
+                                {user?.followers && user?.followers?.includes(loggedUser) ? "Following" : "Follow"}
                             </button>
                         </div>
                     )) : <></>}
