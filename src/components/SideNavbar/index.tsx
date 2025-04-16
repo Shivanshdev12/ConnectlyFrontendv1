@@ -71,6 +71,7 @@ const SideNavbar = ({ open, notifications, handleSearch, handleNotifications }) 
                     >
                         <PiBellSimpleFill className="w-6 h-6" />
                         <span>Notifications</span>
+                        <span className="border rounded-full w-4 h-4 flex align-center justify-center text-[10px] text-white bg-red-500">{notifications?.length}</span>
                     </button>
 
                     <AnimatePresence>

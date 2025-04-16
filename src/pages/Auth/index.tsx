@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router";
 import Login from "./Login";
 import { useDispatch } from "react-redux";
 import { userActions } from "../../services/redux/userSlice";
+import { toast, ToastContainer } from "react-toastify";
 
 const Auth = () => {
     const dispatch = useDispatch();
@@ -18,6 +19,12 @@ const Auth = () => {
         email: "",
         password: "",
     });
+    const [userDetailError, setUserDetailsError] = useState<any>({
+        fnameError: false,
+        lnameError: false,
+        emailError: false,
+        passwordError: false, 
+    });
     const [avatar, setAvatar] = useState("");
 
     const handleChange=(e)=>{
@@ -30,10 +37,44 @@ const Auth = () => {
                 ...prevDetails, 
                 [name]: value,
             }));
+            const key = `${name}Error`;
+            setUserDetailsError((prevDetails) => ({
+                ...prevDetails,
+                [key] : false 
+            }));
         }
     }
+
+    const handleError = (isNewUser = false) => {
+        const localError = userDetailError;
+        if(userDetail?.fname.trim() === "") {
+            localError.fnameError = true;
+        }
+        if(userDetail?.lname.trim() === "") localError.lnameError = true;
+        if(userDetail?.email.trim() === "") localError.emailError = true;
+        if(userDetail?.password.trim() === "") localError.passwordError = true;
+        setUserDetailsError((prevDetails)=>({
+            ...prevDetails,
+            localError
+        }));
+        if(!isNewUser){
+            if(localError?.fnameError || localError?.lnameError || localError?.emailError || localError?.passwordError){
+                return true;
+            }
+        }else{
+            if(localError?.emailError || localError?.passwordError){
+                return true;
+            }
+        }
+        return false;
+    }
+
     const handleSubmit=async(e)=>{
         e.preventDefault();
+        const localError  = handleError(false);
+        if(localError){
+            return;
+        }
         const formData = new FormData();
         try{
             const {fname, lname, email, password} = userDetail;
@@ -56,8 +97,13 @@ const Auth = () => {
             console.log(err);
         }
     }
+
     const handleLogin=async(e)=>{
         e.preventDefault();
+        const localError = handleError(true);
+        if(localError){
+            return;
+        }
         try{
             const {email, password} = userDetail;
             if(email === "" || password === ""){
@@ -73,6 +119,7 @@ const Auth = () => {
                 dispatch(userActions?.setUserProfile(res?.data?.user?.avatar))
                 localStorage.setItem("user", res?.data?.user?._id);
                 localStorage.setItem("avatar",res?.data?.user?.avatar);
+                toast.success("LoggedIn Successfully");
             }
         }
         catch(err){
@@ -86,9 +133,10 @@ const Auth = () => {
         }
     }, [isLoginSuccess, navigate]);
 
-    return <div className="container h-[90vh] m-auto text-left flex flex-col items-center justify-center">
-        {location.pathname === "/register" && <Register userDetail={userDetail} handleSubmit={handleSubmit} handleChange={handleChange} />}
-        {location.pathname === "/login" && <Login userDetail={userDetail} handleSubmit={handleLogin} handleChange={handleChange} />}
+    return <div className="container h-[100vh] m-auto text-left flex flex-col items-center justify-center">
+        {location.pathname === "/register" && <Register userDetail={userDetail} userDetailError={userDetailError} handleSubmit={handleSubmit} handleChange={handleChange} />}
+        {location.pathname === "/login" && <Login userDetail={userDetail} userDetailError={userDetailError} handleSubmit={handleLogin} handleChange={handleChange} />}
+        <ToastContainer/>
     </div>
 }
 

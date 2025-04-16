@@ -11,6 +11,7 @@ import { useAddCommentMutation } from "../../services/api/commentApi";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetNotificationMutation } from "../../services/api/notificationApi";
 import { IRoot } from "../../interface/IUser";
+import { toast, ToastContainer } from "react-toastify";
 
 const Main = () => {
     const [page, setPage] = useState<number>(1);
@@ -80,9 +81,16 @@ const Main = () => {
     };
 
     const handleNotifications=async()=>{
-        const res = await getNotification({userId});
-        if(res?.data?.success){
-            setNotifications(res?.data?.data);
+        try{
+            const res = await getNotification({userId});
+            if(res?.data?.success){
+                setNotifications(res?.data?.data);
+            }else{
+                throw new Error("Error fetching notifications");
+            }
+        }
+        catch(err){
+            toast.error(err?.message);
         }
     }
 
@@ -91,6 +99,10 @@ const Main = () => {
             setFeed(data.data.posts);
         }
     }, [data]);
+
+    useEffect(()=>{
+        handleNotifications();
+    },[]);
 
     if(isLoading){
         return <Loader/>
@@ -128,6 +140,7 @@ const Main = () => {
             </div>
         </div>
         {searchOpen && <SearchUsers isOpen={true} onClose={handleSearchClose} />}
+        <ToastContainer position="bottom-left" />
     </React.Fragment>
 }
 

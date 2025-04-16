@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 
-const Register = ({ userDetail, handleSubmit, handleChange }) => {
+const Register = ({ userDetail, userDetailError, handleSubmit, handleChange }) => {
     return <>
         <div className="border-[1px] border-[#bebebe] p-6 w-[75vw] md:w-[30vw] bg-white shadow-xs">
             <div className="w-[100%] mb-2">
@@ -14,32 +14,37 @@ const Register = ({ userDetail, handleSubmit, handleChange }) => {
                     <input
                         onChange={handleChange}
                         value={userDetail?.fname}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="text" name="fname" id="fname"
+                        className={userDetailError?.fnameError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="text" name="fname" id="fname"
                         placeholder="Enter your first name" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.fnameError ? "Enter appropriate first name" : ""}</p>
                 </div>
                 <div className="flex flex-col w-full">
-                    <label htmlFor="lname" className="text-[2.8vw] md:text-[1vw]">Last Name</label>
+                    <label htmlFor="lname" className="text-[2vw] md:text-[1vw]">Last Name</label>
                     <input
                         value={userDetail?.lname}
                         onChange={handleChange}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="text" name="lname" id="lname"
+                        className={userDetailError?.lnameError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="text" name="lname" id="lname"
                         placeholder="Enter your last name" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.lnameError ? "Enter appropriate last name" : ""}</p>
+                    
                 </div>
                 <div className="flex flex-col w-full">
                     <label htmlFor="email" className="text-[2.8vw] md:text-[1vw]">Email</label>
                     <input
                         value={userDetail?.email}
                         onChange={handleChange}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="email" name="email" id="email"
+                        className={userDetailError?.emailError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="email" name="email" id="email"
                         placeholder="Enter your email" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.emailError ? "Enter appropriate email" : ""}</p>
                 </div>
                 <div className="flex flex-col w-full">
                     <label htmlFor="password" className="text-[2.8vw] md:text-[1vw]">Password</label>
                     <input
                         value={userDetail?.password}
                         onChange={handleChange}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="password" name="password" id="password"
+                        className={userDetailError?.passwordError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="password" name="password" id="password"
                         placeholder="Enter your password" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.passwordError ? "Enter strong password" : ""}</p>
                 </div>
                 <div className="flex flex-col w-full">
                     <label htmlFor="password" className="text-[2.8vw] md:text-[1vw]">Avatar</label>

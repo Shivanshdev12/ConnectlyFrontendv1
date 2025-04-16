@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router";
 
-const Login = ({userDetail, handleChange, handleSubmit}) => {
+const Login = ({userDetail, userDetailError, handleChange, handleSubmit}) => {
     return <>
         <div className="border-[1px] border-[#bebebe] p-6 w-[75vw] md:w-[30vw] bg-white shadow-xs">
             <div className="w-[100%] mb-2">
@@ -14,16 +14,18 @@ const Login = ({userDetail, handleChange, handleSubmit}) => {
                     <input
                         value={userDetail?.email}
                         onChange={handleChange}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="email" name="email" id="email"
+                        className={userDetailError?.emailError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="email" name="email" id="email"
                         placeholder="Enter your email" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.emailError ? "Enter appropriate email" : ""}</p>
                 </div>
                 <div className="flex flex-col w-full">
                     <label htmlFor="password" className="text-[2.8vw] md:text-[1vw]">Password</label>
                     <input
                         value={userDetail?.password}
                         onChange={handleChange}
-                        className="border border-[#989898] p-1 rounded md:p-2" type="password" name="password" id="password"
+                        className={userDetailError?.passwordError ? "border border-[#FF6363] p-1 rounded md:p-2" : "border border-[#989898] p-1 rounded md:p-2"} type="password" name="password" id="password"
                         placeholder="Enter your password" required />
+                    <p className="text-[#FF6363] text-[2.8vw] md:text-[1vw]">{userDetailError?.passwordError ? "Enter appropriate password" : ""}</p>
                 </div>
                 <button onClick={handleSubmit}
                     className="bg-indigo-800 w-full text-white p-2 rounded cursor-pointer">Submit</button>

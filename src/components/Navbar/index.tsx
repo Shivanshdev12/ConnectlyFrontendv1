@@ -9,6 +9,7 @@ import { IRoot } from "../../interface/IUser";
 import { NavLink, useNavigate } from "react-router";
 import { userActions } from "../../services/redux/userSlice";
 import { useCreatePostMutation } from "../../services/api/postApi";
+import { toast } from "react-toastify";
 
 const Navbar = ({ menuOpen, handleGetFeed, handleMenu, handleMenuOpen, handleMenuClose }) => {
     const dispatch = useDispatch();
@@ -44,19 +45,27 @@ const Navbar = ({ menuOpen, handleGetFeed, handleMenu, handleMenuOpen, handleMen
     };
 
     const handleCreatePost=async(e)=>{
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("title",postDetails?.title);
-        formData.append("description",postDetails?.description);
-        if(postDetails?.image){
-            formData.append("image",postDetails?.image);
-        }else{
-            formData.append("image","");
+        try{
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append("title",postDetails?.title);
+            formData.append("description",postDetails?.description);
+            if(postDetails?.image){
+                formData.append("image",postDetails?.image);
+            }else{
+                formData.append("image","");
+            }
+            const res = await createPost(formData);
+            if(res?.data?.success){
+                handleModal();
+                handleGetFeed();
+                toast.success("Post created successfully!");
+            }else{
+                throw new Error("Error creating post!");
+            }
         }
-        const res = await createPost(formData);
-        if(res?.data?.success){
-            handleModal();
-            handleGetFeed();
+        catch(e){
+            toast.error("Error creating post!");
         }
     }
 
