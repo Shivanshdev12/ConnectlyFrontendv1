@@ -129,7 +129,7 @@ const Auth = () => {
 
     useEffect(() => {
         if (isLoginSuccess) {
-            window.location.href = "/home";
+            window.location.href = "/";
         }
     }, [isLoginSuccess, navigate]);
 

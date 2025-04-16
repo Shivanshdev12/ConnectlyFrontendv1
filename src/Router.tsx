@@ -20,11 +20,11 @@ function Router() {
    
    return (
       <Routes>
-         <Route path="/home" element={isAuthenticated ? <App /> : <Navigate to="/login" />} />
+         <Route path="/" element={isAuthenticated ? <App /> : <Navigate to="/login" />} />
          <Route path="/register" element={<Auth />} />
          <Route path="/login" element={<Auth/>} />
          <Route path="/profile" element={isAuthenticated ? <Profile/> : <Navigate to="/login"/>} />
-         <Route path="/" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} />
+         {/* <Route path="/" element={<Navigate to={isAuthenticated ? "/home" : "/login"} />} /> */}
       </Routes>
    );
 }

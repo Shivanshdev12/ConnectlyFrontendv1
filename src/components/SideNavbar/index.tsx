@@ -41,7 +41,7 @@ const SideNavbar = ({ open, notifications, handleSearch, handleNotifications }) 
         <div className="hidden lg:block h-full w-64 border-r border-[#989898] shadow-md relative">
             <div className="flex flex-col p-6 h-screen space-y-4">
                 <NavLink
-                    to="/home"
+                    to="/"
                     className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200"
                 >
                     <PiHouseFill className="w-6 h-6" />
